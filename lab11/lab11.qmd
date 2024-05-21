@@ -1,0 +1,44 @@
+---
+title: "Lab 11 BIMM 143"
+format: pdf
+editor: visual
+---
+
+# Section 1. Proportion of G/G in a Population
+
+Downloaded a CSV file from Ensembl: <https://useast.ensembl.org/Homo_sapiens/Variation/Sample?db=core;r=17:39894595-39895595;v=rs8067378;vdb=variation;vf=959672880#373531_tablePanel>
+
+Here we read this CSV file:
+```{r}
+mxl <- read.csv("mxl.csv")
+head(mxl)
+```
+We see from the analysis below that 14.0625% of the Mexican Ancestry in Los Angeles are homozygous for the asthma associated SNP (G|G) 
+```{r}
+table(mxl$Genotype..forward.strand.)/ nrow(mxl) * 100
+```
+## Section 4. Population Scale Analysis
+
+First, we read the text file we were given into a data frame. Then we look at the first couple rows using the `head()` function.
+```{r}
+expr <- read.table("expr.txt")
+head(expr)
+```
+We check the number of rows to see how many observations we have in our dataset.
+```{r}
+nrow(expr)
+```
+We look at summarized version of the data we get the following:
+```{r}
+table(expr$geno)
+summary(expr$geno)
+```
+Now we create a box plot representing the data in our table:
+```{r}
+library(ggplot2)
+```
+
+```{r}
+ggplot(expr, aes(geno, exp, fill = geno)) + geom_boxplot(notch = TRUE)
+```
+

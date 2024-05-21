@@ -1,0 +1,150 @@
+---
+title: "Class 5: Data Visualization with ggplot"
+author: "Shreyas Sankaranarayanan (PID: A17077452)"
+format: pdf
+toc: false
+---
+
+Today we will have our first play with the **ggplot2** package - one of the most popular graphics packages on the planet.
+
+There are many plotting systems in R. These include so-called *"base"* plotting/graphics. 
+
+```{r}
+plot(cars)
+```
+
+Base plot is generally rather short code and somewhat dull plots - but it is always there for you and is fast for big datasets.
+
+If I want to use **ggplot2** it takes some more work.
+
+```{r}
+#ggplot(cars)
+```
+
+I need to install the package first to my computer. To do this I can use the function `install.packages("ggplot2")`
+
+Every time I want to use a package I need to load it up with a `library()` call.
+
+```{r}
+#Make sure to run in console: install.packages("ggplot2")
+library(ggplot2)
+ggplot(cars)
+```
+
+Every ggplot has at least 3 things:
+
+- **data** (the data.frame that you want to plot)
+- **aes** (the aesthetic mapping of the data to the plot)
+- **geom** (how do you want the plot to look, points, lines, etc.)
+
+
+Let us create a barebones scatterplot of the data
+```{r}
+ggplot(data = cars, mapping = aes(speed, dist)) + geom_point()
+```
+
+Let us add an extra geom parameter:
+```{r}
+ggplot(data = cars, mapping = aes(speed, dist)) + geom_point() + geom_smooth()
+```
+
+I want a linear model and no standard error bounds shown on my plot. I also want nicer axi labels and a title etc.
+```{r}
+ggplot(data = cars, mapping = aes(speed, dist)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + labs(title = "Stopping Distance of Old Cars", x = "Speed of Car (in mph)", y= "Stopping Distance of Car (in ft)")+theme_classic()
+```
+
+## A mroe complicated scatterplot
+
+Here we make a plot of gene expression data:
+
+```{r}
+url <- "https://bioboot.github.io/bimm143_S20/class-material/up_down_expression.txt"
+genes <- read.delim(url)
+head(genes);
+```
+
+Here is a scatterplot plot of condition 1 vs condition 2 which highlights which genes are upregulated (red) or downregulated (blue).
+
+```{r}
+p <- ggplot(data = genes, mapping = aes(Condition1, Condition2, col = State)) + geom_point()
+
+p
+```
+To modfiy the color scheme the function `scale_color_manual()` can be used in this case we want a UCSD themed color scheme (blue, gold, and black). So to implement this you do the following:
+
+```{r}
+p + scale_color_manual(values = c("blue", "black", "gold"))
+```
+
+## Exploring the gapminder dataset
+
+Let us first read the dataset from online:
+
+```{r}
+url <- "https://raw.githubusercontent.com/jennybc/gapminder/master/inst/extdata/gapminder.tsv"
+gapminder <- read.delim(url)
+```
+
+What number of rows?
+```{r}
+nrow(gapminder)
+```
+
+What number of columns?
+```{r}
+ncol(gapminder)
+```
+Let us analyze the contents of this dataset:
+A table of all the years in the dataset
+```{r}
+table(gapminder$year)
+```
+Table of the different continents represented in the dataset
+```{r}
+table(gapminder$continent)
+```
+Unique number of continents
+
+```{r}
+length(unique(gapminder$continent))
+```
+
+Unique number of countries
+```{r}
+length(unique(gapminder$countries))
+```
+
+```{r}
+ggplot(data = gapminder, mapping = aes(gdpPercap, lifeExp)) + geom_point() + labs(title = "GDP per Capita v. Life Expectancy", x = "GDP per Capita (in billions)", y= "Average Life Expectancy (in years)")
+```
+```{r}
+ggplot(data = gapminder, mapping = aes(gdpPercap, lifeExp)) + geom_point(col = "red") + labs(title = "GDP per Capita v. Life Expectancy", x = "GDP per Capita (in billions)", y= "Average Life Expectancy (in years)")
+```
+##Using dplyr package to isolate and analyze gapminder data from 2007
+We will then utilize the **dplyr** package to analyze this data set by single year. If need be run `install.packages("dplyr")`:
+
+```{r}
+#Make sure to run in console: install.packages("dplyr")
+library(dplyr)
+
+gapminder_2007 <- gapminder %>% filter(year==2007)
+```
+
+Lets create a plot for life expectancy in 2007 based on GDP per capita:
+
+```{r}
+ggplot(data = gapminder_2007, mapping = aes(gdpPercap, lifeExp, col = continent, size = pop)) + geom_point(mapping = aes(alpha = 0.2)) + labs(title = "GDP per Capita v. Life Expectancy", x = "GDP per Capita (in billions)", y= "Average Life Expectancy (in years)")+theme_classic() 
+```
+## Introducing `facet_wrap`
+The facet_wrap function merely produces different graphs using the unique entries in a column of a data frame as a qualitative variable and creates different plots based on such.
+
+The graph below uses year as a classifier to create different graphs from:
+```{r}
+ggplot(data = gapminder, mapping = aes(gdpPercap, lifeExp)) + geom_point() + labs(title = "GDP per Capita v. Life Expectancy", x = "GDP per Capita (in billions)", y= "Average Life Expectancy (in years)") + facet_wrap(~year)
+```
+
+The plot below are the same graphs but with the extra aesthetic elements:
+```{r}
+ggplot(data = gapminder, mapping = aes(gdpPercap, lifeExp, col = continent, size = pop)) + geom_point(mapping = aes(alpha = 0.2)) + labs(title = "GDP per Capita v. Life Expectancy", x = "GDP per Capita (in billions)", y= "Average Life Expectancy (in years)")+theme_classic() +facet_wrap(~year)
+```
+

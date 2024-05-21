@@ -1,0 +1,97 @@
+---
+title: "Class 10: Structural Bioinformatics Part 1"
+author: "Shreyas Sankaranarayanan"
+format: html
+---
+
+## What is in the PDB database?
+
+The main repository of biomolecular structures is PDB < www.rcsb.org >
+
+Let's see what the database contains:
+
+```{r}
+pdb = "pdb_stats.csv"
+pdbstats = read.csv(pdb, row.names = 1)
+head(pdbstats)
+```
+
+> Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
+
+```{r}
+x <- pdbstats$Total
+sum(as.numeric(gsub(",","", x)))
+```
+
+
+```{r}
+tum <- function(x)
+{
+ 
+  x <- sum(as.numeric(gsub(",", "", x)))
+  return(x)
+}
+
+```
+
+```{r}
+total <- tum(pdbstats$Total)
+xray <- tum(pdbstats$X.ray)
+em <- tum(pdbstats$EM)
+nmr <- tum(pdbstats$NMR)
+answer <- (xray + em)/total
+answer
+
+```
+
+
+> Q2: What proportion of structures in the PDB are protein?
+
+In UniProt there are 248,805,733 distinct entries which comapred to PDB protein entries 
+
+> Q3: Type HIV in the PDB website search box on the home page and determine how many HIV-1 protease structures are in the current PDB?
+
+
+## Visualizing HIV-1 Protease structure using Mol*
+
+Mol* viewer viewer can be accessed at <https://molstar.org/viewer/>
+
+I want to insert the image taken form Mol*
+
+![My first molecular image](1HSG.png)
+
+
+## Working with bio3d package
+
+```{r}
+library(bio3d)
+pdb <- read.pdb("1HSG")
+pdb
+head(pdb$atom)
+```
+```{r}
+pdbseq(pdb)[25]
+```
+
+4. 
+5. HOH308
+
+##Predicting functional motions of a single structure
+
+We can do a bioifnromatics prediction of functional motions (i.e. flexibility/dynamics)
+
+```{r}
+pdb2 <- read.pdb("6s36")
+pdb2
+```
+
+```{r}
+m <-nma(pdb2)
+plot(m)
+```
+
+```{r}
+mktrj(m, file = "adk_m7.pdb")
+```
+
